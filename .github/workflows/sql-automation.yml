@@ -10,29 +10,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Install SQL Server Client Tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y mssql-tools unixodbc-dev
+    - name: Install SQL Server Client Tools
+      run: |
+        # Import the public repository GPG keys
+        wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 
-      - name: Set up SSH Tunnel
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          AWS_EC2_IP: ${{ secrets.AWS_EC2_IP }}
-        run: |
-          echo "$SSH_PRIVATE_KEY" > key.pem
-          chmod 600 key.pem
-          ssh -i key.pem -L 1433:localhost:1433 ubuntu@$AWS_EC2_IP -N -f
+        # Register the Microsoft Ubuntu repository
+        sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/ubuntu/20.04/mssql-server-2019.list)"
 
-      - name: Run SQL Scripts
-        env:
-          SQL_SERVER: localhost # You can also use ${{ secrets.SQL_SERVER }} if you added it as a secret
-          SQL_USER: ${{ secrets.SQL_USER }}
-          SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
-        run: |
-          echo "Running SQL scripts..."
-          /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -i ./scripts/create-database-and-user.sql
-          /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -d AutoTest -i ./scripts/create-table-and-procedure.sql
+        # Update the package list
+        sudo apt-get update
+
+        # Install mssql-tools with the unixODBC developer package
+        sudo apt-get install -y mssql-tools unixodbc-dev
+
+    - name: Set up SSH Tunnel
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        AWS_EC2_IP: ${{ secrets.AWS_EC2_IP }}
+      run: |
+        echo "$SSH_PRIVATE_KEY" > key.pem
+        chmod 600 key.pem
+        ssh -i key.pem -L 1433:localhost:1433 ubuntu@$AWS_EC2_IP -N -f
+
+    - name: Run SQL Scripts
+      env:
+        SQL_SERVER: localhost
+        SQL_USER: ${{ secrets.SQL_USER }}
+        SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
+      run: |
+        echo "Running SQL scripts..."
+        /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -i ./scripts/create-database-and-user.sql
+        /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -d AutoTest -i ./scripts/create-table-and-procedure.sql
