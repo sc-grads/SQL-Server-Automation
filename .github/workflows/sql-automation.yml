@@ -7,7 +7,7 @@ on:
 
 jobs:
   automate-sql:
-    runs-on: ubuntu-20.04  # Use Ubuntu 20.04 instead of ubuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
@@ -15,17 +15,8 @@ jobs:
 
     - name: Install SQL Server Client Tools
       run: |
-        # Import the public repository GPG keys
-        wget -qO- https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-
-        # Register the Microsoft Ubuntu repository
-        sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/ubuntu/20.04/mssql-server-2019.list)"
-
-        # Update the package list
-        sudo apt-get update
-
-        # Install mssql-tools with the unixODBC developer package
-        sudo apt-get install -y mssql-tools unixodbc-dev
+        # Install mssql-tools using Docker
+        docker run --rm mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -?
 
     - name: Set up SSH Tunnel
       env:
@@ -34,6 +25,11 @@ jobs:
       run: |
         echo "$SSH_PRIVATE_KEY" > key.pem
         chmod 600 key.pem
+
+        # Fetch the host key and add it to known_hosts
+        ssh-keyscan $AWS_EC2_IP >> ~/.ssh/known_hosts
+
+        # Set up the SSH tunnel
         ssh -i key.pem -L 1433:localhost:1433 ubuntu@$AWS_EC2_IP -N -f
 
     - name: Run SQL Scripts
@@ -43,5 +39,5 @@ jobs:
         SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
       run: |
         echo "Running SQL scripts..."
-        /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -i ./scripts/create-database-and-user.sql
-        /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -d AutoTest -i ./scripts/create-table-and-procedure.sql
+        docker run --rm -v $(pwd)/scripts:/scripts mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -i /scripts/create-database-and-user.sql
+        docker run --rm -v $(pwd)/scripts:/scripts mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -d AutoTest -i /scripts/create-table-and-procedure.sql
