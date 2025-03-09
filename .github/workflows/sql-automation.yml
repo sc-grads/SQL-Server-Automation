@@ -26,6 +26,10 @@ jobs:
         echo "$SSH_PRIVATE_KEY" > key.pem
         chmod 600 key.pem
 
+        # Create the .ssh directory if it doesn't exist
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+
         # Fetch the host key and add it to known_hosts
         ssh-keyscan $AWS_EC2_IP >> ~/.ssh/known_hosts
 
