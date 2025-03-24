@@ -36,6 +36,18 @@ jobs:
         # Set up the SSH tunnel
         ssh -i key.pem -L 1433:localhost:1433 ubuntu@$AWS_EC2_IP -N -f
 
+    - name: Verify SQL Scripts in Database Folder
+      run: |
+        # Verify if the SQL scripts are available in the folder
+        echo "Checking contents of Database folder..."
+        ls -la $(pwd)/Database
+
+    - name: Verify Files Inside Docker Container
+      run: |
+        # Debug step: List contents of mounted directory inside the container
+        echo "Checking files inside the Docker container..."
+        docker run --rm -v $(pwd)/Database:/Database mcr.microsoft.com/mssql-tools /bin/bash -c "ls /Database"
+
     - name: Run SQL Scripts
       env:
         SQL_SERVER: localhost
@@ -43,5 +55,14 @@ jobs:
         SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
       run: |
         echo "Running SQL scripts..."
-        docker run --rm -v $(pwd)/Database:/Database mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -i Database/create-database-and-user.sql
-        docker run --rm -v $(pwd)/Database:/Database mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -d AutoTest -i Database/create-table-and-procedure.sql
+
+        # Run create-database-and-user.sql script
+        docker run --rm -v $(pwd)/Database:/Database mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -i /Database/create-database-and-user.sql
+        
+        # Run create-table-and-procedure.sql script
+        docker run --rm -v $(pwd)/Database:/Database mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -d AutoTest -i /Database/create-table-and-procedure.sql
+
+    - name: Check Logs
+      run: |
+        # Optional: Check logs for SQL Server container
+        docker logs <sql_container_name>
