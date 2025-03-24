@@ -13,6 +13,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: List files in the directory
+      run: ls -la $(pwd)
+
     - name: Install SQL Server Client Tools
       run: |
         # Install mssql-tools using Docker
@@ -44,7 +47,6 @@ jobs:
       run: |
         echo "Running SQL scripts..."
         
-        # Running SQL scripts directly without mounting the directory
-        # Make sure the SQL files are available in the working directory
-        docker run --rm -v $(pwd):/scripts mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -i /scripts/Database/create-database-and-user.sql
-        docker run --rm -v $(pwd):/scripts mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -d AutoTest -i /scripts/Database/create-table-and-procedure.sql
+        # Running SQL scripts directly from the root directory
+        docker run --rm -v $(pwd):/scripts mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -i /scripts/create-database-and-user.sql
+        docker run --rm -v $(pwd):/scripts mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -d AutoTest -i /scripts/create-table-and-procedure.sql
