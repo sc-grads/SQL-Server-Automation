@@ -43,5 +43,5 @@ jobs:
         SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
       run: |
         echo "Running SQL scripts..."
-        docker run --rm -v $(pwd)/Database:/Database mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -i /Database/create-database-and-user.sql
-        docker run --rm -v $(pwd)/Database:/Database mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -d AutoTest -i /Database/create-table-and-procedure.sql
+        docker run --rm -v $(pwd)/Database:/Database mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -i Database/create-database-and-user.sql
+        docker run --rm -v $(pwd)/Database:/Database mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -d AutoTest -i Database/create-table-and-procedure.sql
