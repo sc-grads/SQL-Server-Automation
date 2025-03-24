@@ -630,7 +630,8 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\MuzuvukileNqwiliso\\.nuget\\packages\\": {}
+    "C:\\Users\\MuzuvukileNqwiliso\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
@@ -641,8 +642,12 @@
       "packagesPath": "C:\\Users\\MuzuvukileNqwiliso\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\MuzuvukileNqwiliso\\SqlApi\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\MuzuvukileNqwiliso\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\MuzuvukileNqwiliso\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config"
       ],
       "originalTargetFrameworks": [
         "net7.0"
