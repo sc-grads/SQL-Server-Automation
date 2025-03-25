@@ -23,8 +23,6 @@ jobs:
         shell: powershell
 
       - name: Insert Data via API
-        env:
-          API_URL: ${{ secrets.API_URL }}
         run: |
-          curl -X POST "$env:API_URL/api/database/insert" -H "Content-Type: application/json" -d "{\"Name\":\"John\",\"Surname\":\"Doe\",\"Email\":\"john.doe@example.com\"}"
-          curl -X POST "$env:API_URL/api/database/insert" -H "Content-Type: application/json" -d "{\"Name\":\"Jane\",\"Surname\":\"Smith\",\"Email\":\"jane.smith@example.com\"}"
+          curl -X POST "https://pj-julian-injuries-writers.trycloudflare.com/api/database/insert" -H "Content-Type: application/json" -d '{"Name":"John","Surname":"Doe","Email":"john.doe@example.com"}'
+          curl -X POST "https://pj-julian-injuries-writers.trycloudflare.com/api/database/insert" -H "Content-Type: application/json" -d '{"Name":"Jane","Surname":"Smith","Email":"jane.smith@example.com"}'
