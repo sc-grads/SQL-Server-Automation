@@ -20,6 +20,27 @@ jobs:
       run: |
         docker run --rm -v $(pwd)/Database:/scripts ubuntu:latest ls -la /scripts
 
+    - name: Set up SSH Tunnel
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        AWS_EC2_IP: ${{ secrets.AWS_EC2_IP }}
+      run: |
+        echo "$SSH_PRIVATE_KEY" > key.pem
+        chmod 600 key.pem
+
+        # Create the .ssh directory if it doesn't exist
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+
+        # Fetch the host key and add it to known_hosts
+        ssh-keyscan $AWS_EC2_IP >> ~/.ssh/known_hosts
+
+        # Set up the SSH tunnel
+        ssh -i key.pem -L 1433:localhost:1433 ubuntu@$AWS_EC2_IP -N -f
+
+    - name: Wait for SQL Server connection to be available
+      run: sleep 30 # Adjust the sleep duration if necessary
+
     - name: Run SQL Scripts
       env:
         SQL_SERVER: localhost
