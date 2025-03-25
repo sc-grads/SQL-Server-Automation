@@ -3,7 +3,7 @@ name: Setup AutoTest Database
 on:
   push:
     branches:
-      - master  # Note: You used 'master', ensure this matches your branch
+      - master
   workflow_dispatch:
 
 jobs:
@@ -17,20 +17,23 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y curl gnupg
-          curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg
+          # Download and add Microsoft key without piping to gpg
+          curl -fsSL https://packages.microsoft.com/keys/microsoft.asc -o microsoft.asc
+          sudo gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg microsoft.asc
+          rm microsoft.asc  # Clean up
           curl -fsSL https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
           sudo apt-get update
           sudo ACCEPT_EULA=Y apt-get install -y mssql-tools
           echo "/opt/mssql-tools/bin" >> $GITHUB_PATH
-          sqlcmd -?  # Verify sqlcmd installed
+          sqlcmd -?  # Verify sqlcmd is installed
 
       - name: Setup Database and Insert Data
         env:
-          SQL_SERVER: rntod-197-184-78-105.a.free.pinggy.link:35573
+          SQL_SERVER: rntod-197-184-78-105.a.free.pinggy.link,35573  # Updated to new endpoint
           SQL_USER: Auto_user
           SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
         run: |
-          echo "Starting database setup at $(date)"
+          echo "Starting at $(date)"
           sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P ${SQL_PASSWORD} -b -t 30 -Q "IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'AutoTest') CREATE DATABASE AutoTest;" || echo "Failed to create database"
           sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P ${SQL_PASSWORD} -b -t 30 -d AutoTest -Q "IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'user') CREATE TABLE [dbo].[user] (ID INT IDENTITY(1,1) PRIMARY KEY, Name NVARCHAR(100), Surname NVARCHAR(100), Email NVARCHAR(100));" || echo "Failed to create table"
           sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P ${SQL_PASSWORD} -b -t 30 -d AutoTest -Q "IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'InsertUser') DROP PROCEDURE InsertUser; CREATE PROCEDURE InsertUser @Name NVARCHAR(100), @Surname NVARCHAR(100), @Email NVARCHAR(100) AS BEGIN INSERT INTO [dbo].[user] (Name, Surname, Email) VALUES (@Name, @Surname, @Email); END;" || echo "Failed to create procedure"
