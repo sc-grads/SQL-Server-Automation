@@ -8,19 +8,23 @@ on:
 
 jobs:
   setup-database:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest  # Changed from windows-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
-
-      - name: Install sqlcmd
-        run: choco install sqlserver-cmdlineutils -y
-        shell: powershell
+      - name: Install SQL Server Tools (sqlcmd)
+        run: |
+          # Add Microsoft package repository
+          sudo apt-get update
+          sudo apt-get install -y curl gnupg
+          curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg
+          curl -fsSL https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          sudo apt-get update
+          # Install mssql-tools (includes sqlcmd)
+          sudo ACCEPT_EULA=Y apt-get install -y mssql-tools
+          # Add sqlcmd to PATH
+          echo "/opt/mssql-tools/bin" >> $GITHUB_PATH
 
       - name: Setup Database and Insert Data
         env:
@@ -28,8 +32,8 @@ jobs:
           SQL_USER: Auto_user
           SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
         run: |
-          sqlcmd -S $env:SQL_SERVER -U $env:SQL_USER -P $env:SQL_PASSWORD -Q "IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'AutoTest') CREATE DATABASE AutoTest;"
-          sqlcmd -S $env:SQL_SERVER -U $env:SQL_USER -P $env:SQL_PASSWORD -d AutoTest -Q "IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'user') CREATE TABLE [dbo].[user] (ID INT IDENTITY(1,1) PRIMARY KEY, Name NVARCHAR(100), Surname NVARCHAR(100), Email NVARCHAR(100));"
-          sqlcmd -S $env:SQL_SERVER -U $env:SQL_USER -P $env:SQL_PASSWORD -d AutoTest -Q "IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'InsertUser') DROP PROCEDURE InsertUser; CREATE PROCEDURE InsertUser @Name NVARCHAR(100), @Surname NVARCHAR(100), @Email NVARCHAR(100) AS BEGIN INSERT INTO [dbo].[user] (Name, Surname, Email) VALUES (@Name, @Surname, @Email); END;"
-          sqlcmd -S $env:SQL_SERVER -U $env:SQL_USER -P $env:SQL_PASSWORD -d AutoTest -Q "EXEC InsertUser 'John', 'Doe', 'john.doe@example.com';"
-          sqlcmd -S $env:SQL_SERVER -U $env:SQL_USER -P $env:SQL_PASSWORD -d AutoTest -Q "EXEC InsertUser 'Jane', 'Smith', 'jane.smith@example.com';"
+          sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P ${SQL_PASSWORD} -Q "IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'AutoTest') CREATE DATABASE AutoTest;"
+          sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P ${SQL_PASSWORD} -d AutoTest -Q "IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'user') CREATE TABLE [dbo].[user] (ID INT IDENTITY(1,1) PRIMARY KEY, Name NVARCHAR(100), Surname NVARCHAR(100), Email NVARCHAR(100));"
+          sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P ${SQL_PASSWORD} -d AutoTest -Q "IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'InsertUser') DROP PROCEDURE InsertUser; CREATE PROCEDURE InsertUser @Name NVARCHAR(100), @Surname NVARCHAR(100), @Email NVARCHAR(100) AS BEGIN INSERT INTO [dbo].[user] (Name, Surname, Email) VALUES (@Name, @Surname, @Email); END;"
+          sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P ${SQL_PASSWORD} -d AutoTest -Q "EXEC InsertUser 'John', 'Doe', 'john.doe@example.com';"
+          sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P ${SQL_PASSWORD} -d AutoTest -Q "EXEC InsertUser 'Jane', 'Smith', 'jane.smith@example.com';"
