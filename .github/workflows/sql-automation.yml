@@ -16,6 +16,21 @@ jobs:
     - name: List files in the Database folder
       run: ls -la $(pwd)/Database
 
+    - name: Rename SQL file to remove extra extension
+      run: |
+        mv $(pwd)/Database/create-database-and-user.sql.sql $(pwd)/Database/create-database-and-user.sql
+        ls -la $(pwd)/Database
+
     - name: Verify SQL file path inside the container
       run: |
         docker run --rm -v $(pwd)/Database:/scripts ubuntu:latest ls -la /scripts
+
+    - name: Run SQL Scripts
+      env:
+        SQL_SERVER: localhost
+        SQL_USER: ${{ secrets.SQL_USER }}
+        SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
+      run: |
+        echo "Running SQL scripts..."
+        docker run --rm -v $(pwd)/Database:/scripts mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -i /scripts/create-database-and-user.sql
+        docker run --rm -v $(pwd)/Database:/scripts mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -d AutoTest -i /scripts/create-table-and-procedure.sql
