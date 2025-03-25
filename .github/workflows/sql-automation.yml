@@ -16,11 +16,6 @@ jobs:
     - name: List files in the Database folder
       run: ls -la $(pwd)/Database
 
-    - name: Rename SQL file to remove extra extension
-      run: |
-        mv $(pwd)/Database/create-database-and-user.sql.sql $(pwd)/Database/create-database-and-user.sql
-        ls -la $(pwd)/Database
-
     - name: Verify SQL file path inside the container
       run: |
         docker run --rm -v $(pwd)/Database:/scripts ubuntu:latest ls -la /scripts
