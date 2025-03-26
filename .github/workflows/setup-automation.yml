@@ -1,0 +1,26 @@
+name: Setup AutoTest Database
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  setup-database:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/mssql/tools:latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run SQL Setup Script
+        env:
+          SQL_SERVER: rnvxn-41-116-4-193.a.free.pinggy.link,33357
+          SQL_USER: Auto_user
+          SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
+        run: |
+          echo "Starting SQL setup at $(date)"
+          sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P ${SQL_PASSWORD} -b -t 30 -i scripts/setup-database.sql || echo "Failed to execute SQL script"
+          echo "Finished at $(date)"
