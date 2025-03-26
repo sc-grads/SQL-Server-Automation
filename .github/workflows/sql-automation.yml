@@ -17,7 +17,7 @@ jobs:
 
       - name: Run SQL Setup Script
         env:
-          SQL_SERVER: rnnya-197-185-129-76.a.free.pinggy.link,34523 
+          SQL_SERVER: rnvxn-41-116-4-193.a.free.pinggy.link,33357
           SQL_USER: Auto_user
           SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
         run: |
