@@ -1,38 +1,26 @@
-name: SQL Automation
+name: Setup AutoTest Database
 
 on:
   push:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
-  automate-sql:
+  setup-database:
     runs-on: ubuntu-latest
-
+    container:
+      image: mcr.microsoft.com/mssql/tools:latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Install SQL Server Client Tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y mssql-tools unixodbc-dev
-
-      - name: Set up SSH Tunnel
+      - name: Run SQL Setup Script
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          AWS_EC2_IP: ${{ secrets.AWS_EC2_IP }}
-        run: |
-          echo "$SSH_PRIVATE_KEY" > key.pem
-          chmod 600 key.pem
-          ssh -i key.pem -L 1433:localhost:1433 ubuntu@$AWS_EC2_IP -N -f
-
-      - name: Run SQL Scripts
-        env:
-          SQL_SERVER: localhost # You can also use ${{ secrets.SQL_SERVER }} if you added it as a secret
-          SQL_USER: ${{ secrets.SQL_USER }}
+          SQL_SERVER: rnnya-197-185-129-76.a.free.pinggy.link,34523 
+          SQL_USER: Auto_user
           SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
         run: |
-          echo "Running SQL scripts..."
-          /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -i ./scripts/create-database-and-user.sql
-          /opt/mssql-tools/bin/sqlcmd -S $SQL_SERVER -U $SQL_USER -P $SQL_PASSWORD -d AutoTest -i ./scripts/create-table-and-procedure.sql
+          echo "Starting SQL setup at $(date)"
+          sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P ${SQL_PASSWORD} -b -t 30 -i scripts/setup-database.sql || echo "Failed to execute SQL script"
+          echo "Finished at $(date)"
