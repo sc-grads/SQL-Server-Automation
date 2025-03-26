@@ -2,7 +2,7 @@ name: Setup SQL Server Database
 
 on:
   push:
-    branches: [ main ]  # Adjust to master if needed
+    branches: [ master ]  # Adjust to master if needed
   workflow_dispatch:
 
 jobs:
