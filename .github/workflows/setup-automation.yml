@@ -2,7 +2,7 @@ name: Setup SQL Server Database
 
 on:
   push:
-    branches: [ main ]  # Adjust to master if needed
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -12,27 +12,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Add Microsoft repository for SQL Server tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y curl gnupg
-          curl -fsSL https://packages.microsoft.com/keys/microsoft.asc -o microsoft.asc
-          sudo gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg microsoft.asc
-          rm microsoft.asc
-          curl -fsSL https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
-          sudo apt-get update
-
-      - name: Install SQL Server client
-        run: |
-          sudo ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev
-
-      - name: Add SQL Server tools to PATH
-        run: echo "/opt/mssql-tools/bin" >> $GITHUB_PATH
-
-      - name: Setup Database, User, Table, Procedure, and Data
+      - name: Run SQL Setup Script
+        container:
+          image: mcr.microsoft.com/mssql/server:2019-latest
         env:
-          SQL_SERVER: rnvxn-41-116-4-193.a.free.pinggy.link,33357  # Replace with new endpoint if offline
+          SQL_SERVER: rnvxn-41-116-4-193.a.free.pinggy.link,33357
+          SQL_USER: Auto_user
+          SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
         run: |
           echo "Starting SQL setup at $(date)"
-          sqlcmd -S ${SQL_SERVER} -U Auto_user -P ${{ secrets.SQL_PASSWORD }} -b -t 30 -i scripts/setup-database.sql || echo "Failed to execute SQL script"
+          /opt/mssql-tools/bin/sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P ${SQL_PASSWORD} -b -t 30 -i scripts/setup-database.sql || echo "Failed to execute SQL script"
           echo "Finished at $(date)"
