@@ -31,5 +31,5 @@ jobs:
         run: |
           echo "Starting SQL setup at $(date)"
           docker run --rm -v $(pwd):/work mcr.microsoft.com/mssql/server:2019-latest \
-            bash -c "echo 'Running sqlcmd' && /opt/mssql-tools18/bin/sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P '${SQL_PASSWORD}' -b -t 30 -i /work/setup-database.sql || echo 'sqlcmd failed'"
+            bash -c "echo 'Running sqlcmd' && /opt/mssql-tools18/bin/sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P '${SQL_PASSWORD}' -C -b -t 30 -i /work/setup-database.sql || echo 'sqlcmd failed'"
           echo "Finished at $(date)"
