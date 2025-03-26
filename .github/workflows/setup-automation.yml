@@ -2,7 +2,7 @@ name: Setup SQL Server Database
 
 on:
   push:
-    branches: [master]
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:
@@ -12,13 +12,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Verify SQL file exists
+        run: |
+          ls -la
+          if [ -f "setup-database.sql" ]; then
+            echo "SQL file found in root"
+            cat setup-database.sql
+          else
+            echo "SQL file NOT found in root"
+            exit 1
+          fi
+
       - name: Run SQL Setup Script with Docker
         env:
-          SQL_SERVER: rnrsz-41-116-91-254.a.free.pinggy.link,43897
+          SQL_SERVER: rntxg-41-116-4-193.a.free.pinggy.link,41523
           SQL_USER: Auto_user
           SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
         run: |
           echo "Starting SQL setup at $(date)"
           docker run --rm -v $(pwd):/work mcr.microsoft.com/mssql/server:2019-latest \
-            /opt/mssql-tools/bin/sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P "${SQL_PASSWORD}" -b -t 30 -i /work/setup-database.sql || echo "Failed to execute SQL script"
+            bash -c "echo 'Running sqlcmd' && /opt/mssql-tools/bin/sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P '${SQL_PASSWORD}' -b -t 30 -i /work/setup-database.sql -o /work/output.txt || echo 'sqlcmd failed'; cat /work/output.txt || echo 'No output'"
           echo "Finished at $(date)"
