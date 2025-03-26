@@ -2,7 +2,7 @@ name: Setup SQL Server Database
 
 on:
   push:
-    branches: [ master ]  # Changed to master
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:
@@ -26,7 +26,7 @@ jobs:
 
       - name: Setup Database, User, Table, Procedure, and Data
         env:
-          SQL_SERVER: rntxg-41-116-4-193.a.free.pinggy.link,41523  # New endpoint
+          SQL_SERVER: rntxg-41-116-4-193.a.free.pinggy.link,41523
         run: |
           echo "Starting SQL setup at $(date)"
           sqlcmd -S ${SQL_SERVER} -U Auto_user -P ${{ secrets.SQL_PASSWORD }} -b -t 30 -i scripts/setup-database.sql || echo "Failed to execute SQL script"
