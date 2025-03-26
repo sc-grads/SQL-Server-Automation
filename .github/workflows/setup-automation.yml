@@ -10,17 +10,17 @@ jobs:
   setup-database:
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/mssql/tools:18.12.1-1  # Specific version instead of latest
+      image: mcr.microsoft.com/mssql/server:2019-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Run SQL Setup Script
         env:
-          SQL_SERVER: rnnya-197-185-129-76.a.free.pinggy.link,34523  # Update if you have a new endpoint
+          SQL_SERVER: rnvxn-41-116-4-193.a.free.pinggy.link,33357  # Your new endpoint here
           SQL_USER: Auto_user
           SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
         run: |
           echo "Starting SQL setup at $(date)"
-          sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P ${SQL_PASSWORD} -b -t 30 -i scripts/setup-database.sql || echo "Failed to execute SQL script"
+          /opt/mssql-tools/bin/sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P ${SQL_PASSWORD} -b -t 30 -i scripts/setup-database.sql || echo "Failed to execute SQL script"
           echo "Finished at $(date)"
