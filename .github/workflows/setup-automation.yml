@@ -25,8 +25,8 @@ jobs:
 
       - name: Run SQL Setup Script with Docker
         env:
-          SQL_SERVER: rnrsz-41-116-91-254.a.free.pinggy.link,43897
-          SQL_USER: Auto_user
+          SQL_SERVER: ${{ secrets.SQL_SERVER }}
+          SQL_USER: ${{ secrets.SQL_USER }}
           SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
         run: |
           echo "Starting SQL setup at $(date)"
