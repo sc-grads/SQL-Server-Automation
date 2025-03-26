@@ -2,7 +2,8 @@ name: Setup SQL Server Database
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:
@@ -19,6 +20,5 @@ jobs:
           SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
         run: |
           echo "Starting SQL setup at $(date)"
-          docker run --rm -v $(pwd):/work mcr.microsoft.com/mssql/server:2019-latest \
-            /opt/mssql-tools/bin/sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P "${SQL_PASSWORD}" -b -t 30 -i /work/setup-database.sql || echo "Failed to execute SQL script"
+          sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P ${SQL_PASSWORD} -b -t 30 -i scripts/setup-database.sql || echo "Failed to execute SQL script"
           echo "Finished at $(date)"
