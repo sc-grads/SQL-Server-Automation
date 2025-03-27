@@ -31,3 +31,7 @@ GO
 
 EXEC InsertUser 'Honney', 'Librinath', 'honney.librinath@example.com';
 GO
+EXEC InsertUser 'John', 'Doe', 'john.doe@example.com';
+GO
+EXEC InsertUser 'Jane', 'Smith', 'jane.smith@example.com';
+GO
