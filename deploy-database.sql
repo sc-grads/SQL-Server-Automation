@@ -1,9 +1,8 @@
-
-IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'AutoTest')
-    CREATE DATABASE AutoTest;
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'AutoDBMuzuvukile')
+    CREATE DATABASE AutoDBMuzuvukile;
 GO
 
-USE AutoTest;
+USE AutoDBMuzuvukile;
 GO
 
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'user')
@@ -29,9 +28,7 @@ BEGIN
 END;
 GO
 
-EXEC InsertUser 'Honney', 'Librinath', 'honney.librinath@example.com';
+EXEC InsertUser 'Muzuvukile', 'User1', 'muzuvukile.user1@example.com';
 GO
-EXEC InsertUser 'John', 'Doe', 'john.doe@example.com';
-GO
-EXEC InsertUser 'Jane', 'Smith', 'jane.smith@example.com';
+EXEC InsertUser 'Another', 'User2', 'another.user2@example.com';
 GO
