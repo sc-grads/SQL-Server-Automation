@@ -4,7 +4,6 @@ IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'AutoTestDev_27Mar')
 GO
 
 USE AutoTestDev_27Mar;
-GO
 
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'user')
     CREATE TABLE [dbo].[user] (
