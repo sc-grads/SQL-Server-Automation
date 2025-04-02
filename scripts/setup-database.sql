@@ -17,6 +17,7 @@ BEGIN CATCH
     PRINT 'Error switching to database: ' + ERROR_MESSAGE();
     THROW;
 END CATCH;
+GO
 
 BEGIN TRY
     IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'user')
@@ -37,50 +38,42 @@ GO
 BEGIN TRY
     IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'InsertUser')
         DROP PROCEDURE InsertUser;
-    GO
-    CREATE PROCEDURE InsertUser
-        @Name NVARCHAR(100),
-        @Surname NVARCHAR(100),
-        @Email NVARCHAR(100)
-    AS
-    BEGIN
-        INSERT INTO [dbo].[user] (Name, Surname, Email)
-        VALUES (@Name, @Surname, @Email);
-    END;
-    PRINT 'Stored procedure InsertUser created successfully.';
+    PRINT 'Dropped existing procedure.';
 END TRY
 BEGIN CATCH
-    PRINT 'Error creating stored procedure: ' + ERROR_MESSAGE();
+    PRINT 'Error dropping procedure: ' + ERROR_MESSAGE();
+    THROW;
+END CATCH;
+GO
+
+CREATE PROCEDURE InsertUser
+    @Name NVARCHAR(100),
+    @Surname NVARCHAR(100),
+    @Email NVARCHAR(100)
+AS
+BEGIN
+    INSERT INTO [dbo].[user] (Name, Surname, Email)
+    VALUES (@Name, @Surname, @Email);
+END;
+PRINT 'Stored procedure InsertUser created successfully.';
+GO
+
+BEGIN TRY
+    EXEC InsertUser 'Sipho', 'Mkhize', 'sipho.mkhize@example.com';
+    PRINT 'Inserted user Sipho Mkhize successfully.';
+END TRY
+BEGIN CATCH
+    PRINT 'Error inserting first user: ' + ERROR_MESSAGE();
     THROW;
 END CATCH;
 GO
 
 BEGIN TRY
-    EXEC InsertUser 'Honney', 'Librinath', 'honney.librinath@example.com';
-    PRINT 'Inserted user Honney Librinath successfully.';
+    EXEC InsertUser 'Lerato', 'Nkosi', 'lerato.nkosi@example.com';
+    PRINT 'Inserted user Lerato Nkosi successfully.';
 END TRY
 BEGIN CATCH
-    PRINT 'Error inserting user Honney Librinath: ' + ERROR_MESSAGE();
-    THROW;
-END CATCH;
-GO
-
-BEGIN TRY
-    EXEC InsertUser 'John', 'Doe', 'john.doe@example.com';
-    PRINT 'Inserted user John Doe successfully.';
-END TRY
-BEGIN CATCH
-    PRINT 'Error inserting user John Doe: ' + ERROR_MESSAGE();
-    THROW;
-END CATCH;
-GO
-
-BEGIN TRY
-    EXEC InsertUser 'Jane', 'Smith', 'jane.smith@example.com';
-    PRINT 'Inserted user Jane Smith successfully.';
-END TRY
-BEGIN CATCH
-    PRINT 'Error inserting user Jane Smith: ' + ERROR_MESSAGE();
+    PRINT 'Error inserting second user: ' + ERROR_MESSAGE();
     THROW;
 END CATCH;
 GO
