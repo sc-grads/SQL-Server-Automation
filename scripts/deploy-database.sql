@@ -1,8 +1,8 @@
-IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'AutoTest_MN_27Mar')
-    CREATE DATABASE AutoTest_MN_27Mar;
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'AutoTest_MN_02April')
+    CREATE DATABASE AutoTest_MN_02April;
 GO
 
-USE AutoTest_MN_27Mar;
+USE AutoTest_MN_02April;
 GO
 
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'user')
