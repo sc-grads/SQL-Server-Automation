@@ -31,7 +31,7 @@ jobs:
         run: |
           echo "Starting SQL setup at $(date)"
           docker run --rm -v $(pwd):/work mcr.microsoft.com/mssql/server:2019-latest \
-            bash -c "echo 'Running sqlcmd' && /opt/mssql-tools18/bin/sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P '${SQL_PASSWORD}' -C -b -t 30 -i /work/setup-database.sql || echo 'sqlcmd failed'"
+            bash -c "echo 'Running sqlcmd' && /opt/mssql-tools18/bin/sqlcmd -S ${SQL_SERVER} -U ${SQL_USER} -P '${SQL_PASSWORD}' -C -b -t 30 -i /work/scripts/setup-database.sql || echo 'sqlcmd failed'"
           echo "Finished at $(date)"
 
   deploy:
@@ -61,5 +61,5 @@ jobs:
         run: |
           echo "Starting deployment at $(date)"
           docker run --rm -v $(pwd):/work mcr.microsoft.com/mssql/server:2019-latest \
-            bash -c "echo 'Running sqlcmd for deploy' && /opt/mssql-tools18/bin/sqlcmd -S ${DEPLOY_SQL_SERVER} -U ${DEPLOY_SQL_USER} -P '${DEPLOY_SQL_PASSWORD}' -C -b -t 30 -i /work/deploy-database.sql || echo 'Deploy sqlcmd failed'"
+            bash -c "echo 'Running sqlcmd for deploy' && /opt/mssql-tools18/bin/sqlcmd -S ${DEPLOY_SQL_SERVER} -U ${DEPLOY_SQL_USER} -P '${DEPLOY_SQL_PASSWORD}' -C -b -t 30 -i /work/scripts/deploy-database.sql || echo 'Deploy sqlcmd failed'"
           echo "Finished deployment at $(date)"
