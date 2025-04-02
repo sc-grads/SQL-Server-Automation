@@ -38,22 +38,24 @@ GO
 BEGIN TRY
     IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'InsertUser')
         DROP PROCEDURE InsertUser;
-    GO
-    CREATE PROCEDURE InsertUser
-        @Name NVARCHAR(100),
-        @Surname NVARCHAR(100),
-        @Email NVARCHAR(100)
-    AS
-    BEGIN
-        INSERT INTO [dbo].[user] (Name, Surname, Email)
-        VALUES (@Name, @Surname, @Email);
-    END;
-    PRINT 'Stored procedure InsertUser created successfully.';
+    PRINT 'Dropped existing procedure.';
 END TRY
 BEGIN CATCH
-    PRINT 'Error creating stored procedure: ' + ERROR_MESSAGE();
+    PRINT 'Error dropping procedure: ' + ERROR_MESSAGE();
     THROW;
 END CATCH;
+GO
+
+CREATE PROCEDURE InsertUser
+    @Name NVARCHAR(100),
+    @Surname NVARCHAR(100),
+    @Email NVARCHAR(100)
+AS
+BEGIN
+    INSERT INTO [dbo].[user] (Name, Surname, Email)
+    VALUES (@Name, @Surname, @Email);
+END;
+PRINT 'Stored procedure InsertUser created successfully.';
 GO
 
 BEGIN TRY
