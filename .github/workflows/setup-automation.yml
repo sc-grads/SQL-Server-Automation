@@ -15,11 +15,12 @@ jobs:
       - name: Verify SQL file exists
         run: |
           ls -la
+          cd scripts
           if [ -f "setup-database.sql" ]; then
-            echo "SQL file found in root"
+            echo "SQL file found in scripts"
             cat setup-database.sql
           else
-            echo "SQL file NOT found in root"
+            echo "SQL file NOT found in scripts"
             exit 1
           fi
 
@@ -45,6 +46,7 @@ jobs:
       - name: Verify SQL file exists
         run: |
           ls -la
+          cd scripts
           if [ -f "deploy-database.sql" ]; then
             echo "SQL file found in root"
             cat deploy-database.sql
