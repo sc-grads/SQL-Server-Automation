@@ -60,7 +60,6 @@ GO
 
 BEGIN TRY
     EXEC InsertUser 'Sipho', 'Mkhize', 'sipho.mkhize@example.com';
-    PRINT 'Inserted user Sipho Mkhize successfully.';
 END TRY
 BEGIN CATCH
     PRINT 'Error inserting first user: ' + ERROR_MESSAGE();
@@ -70,7 +69,6 @@ GO
 
 BEGIN TRY
     EXEC InsertUser 'Lerato', 'Nkosi', 'lerato.nkosi@example.com';
-    PRINT 'Inserted user Lerato Nkosi successfully.';
 END TRY
 BEGIN CATCH
     PRINT 'Error inserting second user: ' + ERROR_MESSAGE();
