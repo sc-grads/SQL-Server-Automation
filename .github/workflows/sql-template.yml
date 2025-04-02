@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       environment_name:
-        description: 'Name of the environment (optional)'
+        description: 'Name of the environment to deploy to'
         required: false
         type: string
     secrets:

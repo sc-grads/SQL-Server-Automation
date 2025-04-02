@@ -1,9 +1,9 @@
 
-IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'AutoTest_MN_27March')
-    CREATE DATABASE AutoTest_MN_27March;
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'AutoTest_MN_02April')
+    CREATE DATABASE AutoTest_MN_02April;
 GO
 
-USE AutoTest_MN_27March;
+USE AutoTest_MN_02April;
 
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'user')
     CREATE TABLE [dbo].[user] (
