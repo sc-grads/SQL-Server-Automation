@@ -38,6 +38,7 @@ GO
 BEGIN TRY
     IF EXISTS (SELECT * FROM sys.procedures WHERE name = 'InsertUser')
         DROP PROCEDURE InsertUser;
+    GO
     CREATE PROCEDURE InsertUser
         @Name NVARCHAR(100),
         @Surname NVARCHAR(100),
