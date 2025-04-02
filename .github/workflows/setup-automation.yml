@@ -7,7 +7,7 @@ jobs:
   development:
     uses: ./.github/workflows/sql-template.yml
     with:
-      sql_file: 'setup-database.sql'
+      sql_file: "setup-database.sql"
     secrets:
       sql_server: ${{ secrets.SQL_SERVER }}
       sql_user: ${{ secrets.SQL_USER }}
@@ -17,8 +17,8 @@ jobs:
     needs: development
     uses: ./.github/workflows/sql-template.yml
     with:
-      sql_file: 'deploy-database.sql'
-      environment_name: 'production'
+      sql_file: "setup-database.sql"
+      environment_name: "production"
     secrets:
       sql_server: ${{ secrets.DEPLOY_SQL_SERVER }}
       sql_user: ${{ secrets.DEPLOY_SQL_USER }}
